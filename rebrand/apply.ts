@@ -569,7 +569,8 @@ async function read(file: string) {
   if (cache.has(full)) return cache.get(full)
   const handle = Bun.file(full)
   if (!(await handle.exists())) return undefined
-  const text = await handle.text()
+  // Windows checkouts convert to CRLF, which would break every multi-line find.
+  const text = (await handle.text()).replaceAll("\r\n", "\n")
   cache.set(full, text)
   return text
 }
